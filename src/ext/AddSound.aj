@@ -15,14 +15,6 @@ import battleship.model.*;
  * @author ajgarcia09
  *
  */
-/*Hint: You may use the following code snippet to play an audio
-clip. It assumes that audio files are stored in the directory
-src/sounds.*/
-
- /** Directory where audio files are stored. */
-
-
-
 public aspect AddSound {
 	
 	 private static final String SOUND_DIR = "/sounds/";
@@ -34,7 +26,6 @@ public aspect AddSound {
 		
 	
 	after(): boardWasHit(){
-		System.out.println("Board was hit!!");
 		playAudio(BOARD_HIT_SOUND);
 	}
 	
@@ -42,7 +33,6 @@ public aspect AddSound {
 		call(void Board.notifyShipSunk(Ship));
 	
 	after(): shipWasSunk(){
-		System.out.println("Ship was sunk!!");
 		playAudio(SHIP_SUNK_SOUND);
 	}
 		
