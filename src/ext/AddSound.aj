@@ -25,8 +25,9 @@ src/sounds.*/
 
 public aspect AddSound {
 	
-	 private static final String SOUND_DIR = "../src/sounds";
-	 private static final String boardHitSound = "impact.mp3"; 
+	 private static final String SOUND_DIR = "/sounds/";
+	 private static final String BOARD_HIT_SOUND = "blast.wav";
+	 private static final String SHIP_SUNK_SOUND = "siren.wav";
 	
 	pointcut boardWasHit(): 
 		call(void Board.notifyHit(Place,int));
@@ -34,7 +35,7 @@ public aspect AddSound {
 	
 	after(): boardWasHit(){
 		System.out.println("Board was hit!!");
-		playAudio(boardHitSound);
+		playAudio(BOARD_HIT_SOUND);
 	}
 	
 	pointcut shipWasSunk():
@@ -42,6 +43,7 @@ public aspect AddSound {
 	
 	after(): shipWasSunk(){
 		System.out.println("Ship was sunk!!");
+		playAudio(SHIP_SUNK_SOUND);
 	}
 		
 	 /** Play the given audio file. Inefficient because a file will be 
