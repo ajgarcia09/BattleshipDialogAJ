@@ -15,6 +15,8 @@ import battleship.*;
             */
 
 public privileged aspect AddStrategy {
+	
+	
 	private JButton playButton = new JButton("Play");
 	
 	
@@ -28,15 +30,20 @@ public privileged aspect AddStrategy {
 		playButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("You clicked the Play button!");
-				//(width, height)
-				//comment these and #1 and #2 will work! :D
-				dialog.setSize(700, 450);
-				BoardPanel playerBoard = new BoardPanel(new Board(10),Constants.DEFAULT_TOP_MARGIN,350, 
-						Constants.DEFAULT_PLACE_SIZE, Constants.DEFAULT_BOARD_COLOR,
-						Constants.DEFAULT_HIT_COLOR,Constants.DEFAULT_MISS_COLOR);
-				dialog.add(playerBoard);
+			
 			}
 });
+	}
+		pointcut addBoard(BattleshipDialog newDialog):
+			execution(JPanel makeBoardPane()) && this(newDialog);
+
+		JPanel around(BattleshipDialog newDialog) : addBoard(newDialog){
+			JPanel newPanel = new JPanel(new BorderLayout());
+			newPanel.add(new BoardPanel(newDialog.board,0,0,10,Constants.DEFAULT_BOARD_COLOR,
+					Constants.DEFAULT_HIT_COLOR,Constants.DEFAULT_MISS_COLOR),BorderLayout.NORTH);
+			newPanel.add(proceed(newDialog),BorderLayout.CENTER);
+			return newPanel;
+		
 	}
 	
 
