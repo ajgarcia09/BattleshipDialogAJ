@@ -21,25 +21,23 @@ public privileged aspect AddStrategy {
         buttons.add(playButton);
         JComboBox menu = create();
         newButtons.add(menu);
+        Board opponent = new Board(10);
+        BoardPanel opBoard = new BoardPanel(opponent, 5, 5, 10,
+                new Color(51, 153, 255), Color.RED, Color.GRAY);
+        opBoard.setPreferredSize(new Dimension(150, 150));
+
         playButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (JOptionPane.showConfirmDialog(dialog,
                         "Play a new game?", "Battleship", JOptionPane.YES_NO_OPTION)
                         == JOptionPane.YES_OPTION) {
                     System.out.println("You clicked the Play button!");
-                    Board opponent = new Board(10);
+                    opponent.reset();
                     placeShips(opponent);
-
-                    BoardPanel opBoard = new BoardPanel(opponent, 5, 5, 10,
-                            new Color(51, 153, 255), Color.RED, Color.GRAY);
-
-
-                    opBoard.setPreferredSize(new Dimension(150, 150));
-
-
                     newButtons.add(opBoard);
                     dialog.setVisible(true);
                     dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
                 }
             }
         });
@@ -51,6 +49,7 @@ public privileged aspect AddStrategy {
         JComboBox<String> ops = new JComboBox<>(strat);
         return ops;
     }
+
     private void placeShips(Board board){
         Random random = new Random();
         int size = board.size();
