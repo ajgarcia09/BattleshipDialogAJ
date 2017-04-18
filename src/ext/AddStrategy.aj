@@ -12,7 +12,6 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 public privileged aspect AddStrategy {	
 	private JButton playButton = new JButton("Play");
     private JPanel newButtons;
-    private BattleshipDialog oDialog;
 
 	//rename the "Play" button to "Practice
 	after(BattleshipDialog dialog): target(dialog) && call(JPanel BattleshipDialog.makeControlPane()){
@@ -20,42 +19,33 @@ public privileged aspect AddStrategy {
         JPanel buttons = (JPanel) dialog.playButton.getParent();
         newButtons = buttons;
         buttons.add(playButton);
-        playButton.addActionListener(this:: play);
-        oDialog = dialog;
+        JComboBox menu = create();
+        newButtons.add(menu);
+        playButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (JOptionPane.showConfirmDialog(dialog,
+                        "Play a new game?", "Battleship", JOptionPane.YES_NO_OPTION)
+                        == JOptionPane.YES_OPTION) {
+                    System.out.println("You clicked the Play button!");
+                    Board opponent = new Board(10);
+                    placeShips(opponent);
+
+                    BoardPanel opBoard = new BoardPanel(opponent, 5, 5, 10,
+                            new Color(51, 153, 255), Color.RED, Color.GRAY);
 
 
+                    opBoard.setPreferredSize(new Dimension(150, 150));
+
+
+                    newButtons.add(opBoard);
+                    dialog.setVisible(true);
+                    dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+                }
+            }
+        });
     }
 
-    private void play(ActionEvent event){
-        BattleshipDialog op = new BattleshipDialog(new Dimension(335,580));
 
-        if (JOptionPane.showConfirmDialog(op,
-                "Play a new game?", "Battleship", JOptionPane.YES_NO_OPTION)
-                == JOptionPane.YES_OPTION) {
-            Board opponent = new Board(10);
-            placeShips(opponent);
-
-            BoardPanel opBoard = new BoardPanel(opponent,5,5,10,
-                    new Color(51,153,255), Color.RED, Color.GRAY);
-
-            JComboBox menu = create();
-            opBoard.setPreferredSize(new Dimension(150,150));
-
-
-            newButtons.add(menu);
-            newButtons.add(opBoard);
-
-            op.setVisible(true);
-            op.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-            //oDialog.dispose();
-
-
-
-
-            //oDialog.dispose();
-        }
-
-    }
     private JComboBox create(){
         String[] strat = {"", "sweep", "smart"};
         JComboBox<String> ops = new JComboBox<>(strat);
