@@ -135,6 +135,63 @@ public privileged aspect AddStrategy {
         }
 
     }
+    
+    private void smartStrategy(BoardPanel opponent){
+    	int row = 0;
+    	int col = 0;
+    	while(!opponent.board.isGameOver()){
+    		//max  = 10 (the board size)
+    		//min = 1 (the smallest board index)
+    		row = (int)(Math.random() * ((10 - 1) + 1)) + 1;
+    		col = (int)(Math.random() * ((10 - 1) + 1)) + 1;
+    		Place hitSpot = new Place(row,col,opponent.board);
+    		//mark this place as hit
+    		hitSpot.hit();
+    		//if there's a ship at opponentBoard[row][col]
+    		if(hitSpot.hasShip()){
+    			//get the ship that's on this place & its size
+    			Ship targetShip = hitSpot.ship();
+    			int shipSize = targetShip.size();
+    			if(targetShip.isHorizontal()){
+    				//if this place is the ship's head || the tail
+    				if((targetShip.head().x == row && targetShip.head().y == col) || 
+    						(targetShip.tail().x == row && targetShip.tail().y == col)){
+    					//find if targetShip is oriented to the right
+    					if(targetShip.places.contains(opponent.board.at(row,col+1)) && (col+1 <= opponent.board.size())){
+    						for(int i=0; i<targetShip.size();i++){
+    							//mark opponentBoard[row][col+1] as hit
+    							opponent.board.at(row,col+1).isHit = true;    							
+    						}
+   	
+    					}
+    					//the ship is oriented to the left
+    					else if (targetShip.places.contains(opponent.board.at(row,col-1)) && (col-1<= opponent.board.size())){
+    						for(int i=0; i<targetShip.size();i++){
+    							opponent.board.at(row,col-1).isHit = true;
+    						}
+    					}
+    					else{//it's neither head, nor tail, it's one of the spots in the middle of the ship
+    						
+    					}
+    				}
+    			}
+    			else if(targetShip.isVertical()){
+    				//if this place is the ship's head || the tail
+    				if((targetShip.head().x == row && targetShip.head().y == col)||
+    						(targetShip.tail().x==row && targetShip.tail().y == col)){
+    					//find if targetShip is oriented above
+    					if(targetShip.places.contains(opponent.board.at(row+1,col)) && (row+1 <= opponent.board.size())){
+    						for(int i=0; i<targetShip.size();i++){
+    							//mark opponentBoard[row][col+1] as hit
+    							opponent.board.at(row+1,col).isHit = true;    							
+    						}
+    					}
+    					
+    				}    				
+    			}
+    		}
+    	}
+    }
 	
 
 }
