@@ -15,6 +15,7 @@ public privileged aspect AddStrategy {
     private BoardPanel opponentB;
     private boolean play = false;
     private String strategy = "Random";
+    private final static Dimension def = new Dimension(335,440);
 
     /** rename the "Play" button to "Practice **/
     after(BattleshipDialog dialog): target(dialog) && call(JPanel BattleshipDialog.makeControlPane()){
@@ -22,10 +23,9 @@ public privileged aspect AddStrategy {
         JPanel buttons = (JPanel) dialog.playButton.getParent();
         newButtons = buttons;
         buttons.add(playButton);
-
+        Dimension newSize = new Dimension(335,550);
         JComboBox menu = create();
         newButtons.add(menu);
-
         //Adds your board board for computer
         Board opponent = new Board(10);
         BoardPanel opBoard = new BoardPanel(opponent, 5, 5, 10,
@@ -40,7 +40,7 @@ public privileged aspect AddStrategy {
                         "Play a new game?", "Battleship", JOptionPane.YES_NO_OPTION)
                         == JOptionPane.YES_OPTION) {
                     System.out.println("You clicked the Play button!");
-
+                    dialog.resize(newSize);
                     play = true;
                     dialog.board.reset();
                     opponent.reset();
@@ -51,20 +51,23 @@ public privileged aspect AddStrategy {
                     dialog.setVisible(true);
                     dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-
-
-
                 }
             }
         });
 
         /** Action Listener for Practice button **/
         dialog.playButton.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                play = false;
-                dialog.board.reset();
-                newButtons.remove(opBoard);
+                if (JOptionPane.showConfirmDialog(dialog,
+                        "Play a new game?", "Battleship", JOptionPane.YES_NO_OPTION)
+                        == JOptionPane.YES_OPTION) {
 
+                    dialog.resize(def);
+                    play = false;
+                    dialog.board.reset();
+                    newButtons.remove(opBoard);
+                }
             }
         });
 
