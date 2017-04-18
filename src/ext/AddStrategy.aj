@@ -1,65 +1,81 @@
 package ext;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import java.awt.event.ActionListener;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 import battleship.model.Board;
+import battleship.model.Ship;
 import battleship.Constants;
 import battleship.*;
-
-/*  public BoardPanel(Board board,
-            int topMargin, int leftMargin, int placeSize,
-            Color boardColor, Color hitColor, Color missColor)
-            */
+import java.util.Random;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 public privileged aspect AddStrategy {	
-	private JButton playButton = new JButton("Play");	
-	
-	//rename the "Play" button to "Practice
-	after(BattleshipDialog dialog): this(dialog)
-		&& execution(JPanel BattleshipDialog.makeControlPane()){
-		dialog.playButton.setText("Practice");
-		JPanel buttons = (JPanel) dialog.playButton.getParent();
-		buttons.add(playButton);
-		//add an event handler for the new playButton
-		playButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				/*I originally created a new JPanel and added the BoardPanel to the 
-				 * JPanel and then tried adding the JPanel to dialog (a BattleshipDialog obj)
-				 * Since it didn't work, I tried just adding a new BoardPanel directly to the 
-				 * dialog, but it doesn't show.
-				 * I set the background to magenta just to see if anything at all was being 
-				 * addeed to the dialog 
-				 */
-				System.out.println("You clicked the Play button!");
-				dialog.setSize(335,600);
-				//JPanel newPanel = new JPanel(new BorderLayout());
-				//newPanel.setBackground(Color.MAGENTA);
-				dialog.add(new BoardPanel(new Board(10),0,0,10,Constants.DEFAULT_BOARD_COLOR,
-					Constants.DEFAULT_HIT_COLOR,Constants.DEFAULT_MISS_COLOR),BorderLayout.NORTH);
-				//dialog.add(newPanel);
-				//newPanel.setVisible(true);
+	private JButton playButton = new JButton("Play");
+    private JPanel newButtons;
+    private BattleshipDialog oDialog;
 
-			}
-});
-	}
-	/*this code snippet adds a new BoardPanel as soon as the program is run
-	 * (it doesn't wait for the play button to be clicked)
-	 * It only shows a portion of the new BoardPanel (topmost row)
-	 */
-//		pointcut addBoard(BattleshipDialog newDialog):
-//			execution(JPanel makeBoardPane()) && this(newDialog);
-//
-//		JPanel around(BattleshipDialog newDialog) : addBoard(newDialog){
-//			JPanel newPanel = new JPanel(new BorderLayout());
-//			newPanel.add(new BoardPanel(newDialog.board,0,0,10,Constants.DEFAULT_BOARD_COLOR,
-//					Constants.DEFAULT_HIT_COLOR,Constants.DEFAULT_MISS_COLOR),BorderLayout.NORTH);
-//			newPanel.add(proceed(newDialog),BorderLayout.CENTER);
-//			return newPanel;
-//		
-//	}
+	//rename the "Play" button to "Practice
+	after(BattleshipDialog dialog): target(dialog) && call(JPanel BattleshipDialog.makeControlPane()){
+        dialog.playButton.setText("Practice");
+        JPanel buttons = (JPanel) dialog.playButton.getParent();
+        newButtons = buttons;
+        buttons.add(playButton);
+        playButton.addActionListener(this:: play);
+        oDialog = dialog;
+
+
+    }
+
+    private void play(ActionEvent event){
+        BattleshipDialog op = new BattleshipDialog(new Dimension(335,580));
+
+        if (JOptionPane.showConfirmDialog(op,
+                "Play a new game?", "Battleship", JOptionPane.YES_NO_OPTION)
+                == JOptionPane.YES_OPTION) {
+            Board opponent = new Board(10);
+            placeShips(opponent);
+
+            BoardPanel opBoard = new BoardPanel(opponent,5,5,10,
+                    new Color(51,153,255), Color.RED, Color.GRAY);
+
+            JComboBox menu = create();
+            opBoard.setPreferredSize(new Dimension(150,150));
+
+
+            newButtons.add(menu);
+            newButtons.add(opBoard);
+
+            op.setVisible(true);
+            op.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            //oDialog.dispose();
+
+
+
+
+            //oDialog.dispose();
+        }
+
+    }
+    private JComboBox create(){
+        String[] strat = {"", "sweep", "smart"};
+        JComboBox<String> ops = new JComboBox<>(strat);
+        return ops;
+    }
+    private void placeShips(Board board){
+        Random random = new Random();
+        int size = board.size();
+        for (Ship ship : board.ships()) {
+            int i = 0;
+            int j = 0;
+            boolean dir = false;
+            do {
+                i = random.nextInt(size) + 1;
+                j = random.nextInt(size) + 1;
+                dir = random.nextBoolean();
+            } while (!board.placeShip(ship, i, j, dir));
+        }
+
+    }
 	
 
 }
