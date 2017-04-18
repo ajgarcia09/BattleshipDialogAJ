@@ -66,7 +66,10 @@ public privileged aspect AddCheatKey {
                 int x = bPanel.leftMargin + (p.getX() - 1) * bPanel.placeSize;
                 int y = bPanel.topMargin + (p.getY() - 1) * bPanel.placeSize;
                 g.setColor(Color.GREEN);
-                g.fillRect(x + 1, y + 1, bPanel.placeSize - 1, bPanel.placeSize - 1);
+                g.drawLine(x + 1, y + 1,
+                        x + bPanel.placeSize - 1, y + bPanel.placeSize - 1);
+                g.drawLine(x + 1, y + bPanel.placeSize - 1,
+                        x + bPanel.placeSize - 1, y + 1);
 
             }
         }
