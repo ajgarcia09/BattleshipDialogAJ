@@ -186,6 +186,17 @@ public privileged aspect AddStrategy {
     							opponent.board.at(row+1,col).isHit = true;    							
     						}
     					}
+    					//the ship is oriented below
+    					else if(targetShip.places.contains(opponent.board.at(row-1,col))&& (row-1<=opponent.board.size())){
+    						for(int i=0; i<targetShip.size();i++){
+    							//mark opponentBoard[row][col+1] as hit
+    							opponent.board.at(row-1,col).isHit = true;    							
+    						}
+    					}
+    					//i
+    					else{//it's neither head, nor tail, it's one of the spots in the middle of the ship
+    						
+    					}
     					
     				}    				
     			}
