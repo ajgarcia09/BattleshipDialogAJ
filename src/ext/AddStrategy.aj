@@ -17,7 +17,7 @@ public privileged aspect AddStrategy {
     private String strategy = "Random";
     private final static Dimension def = new Dimension(335,440);
 
-    /** rename the "Play" button to "Practice **/
+    /** rename the "Play" button to "Practice" **/
     after(BattleshipDialog dialog): target(dialog) && call(JPanel BattleshipDialog.makeControlPane()){
         dialog.playButton.setText("Practice");
         JPanel buttons = (JPanel) dialog.playButton.getParent();
