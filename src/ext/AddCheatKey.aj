@@ -1,5 +1,5 @@
 /**
- * Shows the enemy ships when F5 is pressed.
+ /* Shows the enemy ships when F5 is pressed.
  * @author Jesus Juarez
  *
  **/

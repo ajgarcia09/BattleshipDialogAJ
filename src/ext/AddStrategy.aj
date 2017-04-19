@@ -1,3 +1,8 @@
+/*
+ * Source Code by Jesus Juarez
+ * and Ana Garcia
+ */
+		
 package ext;
 import java.awt.*;
 import java.awt.event.*;
