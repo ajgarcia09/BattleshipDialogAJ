@@ -165,85 +165,115 @@ public privileged aspect AddStrategy {
         }
 
     }
+    
     private void smartStrategy(BoardPanel opponent){
-        int row = 0;
-        int col = 0;
-        while(!opponent.board.isGameOver()){
-            //max  = 10 (the board size)
-            //min = 1 (the smallest board index)
-            row = (int)(Math.random() * ((10 - 1) + 1)) + 1;
-            col = (int)(Math.random() * ((10 - 1) + 1)) + 1;
-            Place hitSpot = new Place(row,col,opponent.board);
-            //mark this place as hit
-            hitSpot.hit();
-            //if there's a ship at opponentBoard[row][col]
-            if(hitSpot.hasShip()){
-                //get the ship that's on this place & its size
-                Ship targetShip = hitSpot.ship();
-                int shipSize = targetShip.size();
-                if(targetShip.isHorizontal()){
-                    //if this place is the ship's head || the tail
-                    if((targetShip.head().x == row && targetShip.head().y == col) ||
-                            (targetShip.tail().x == row && targetShip.tail().y == col)){
-                        //find if targetShip is oriented to the right
-                        if(targetShip.places.contains(opponent.board.at(row,col+1)) && (col+1 <= opponent.board.size())){
-                            //mark opponentBoard[row][col+1] as hit
-                            for(int i=0; i<targetShip.size();i++)
-                                opponent.board.at(row,col+1).isHit = true;
-                        }
-                        //the ship is oriented to the left
-                        else if (targetShip.places.contains(opponent.board.at(row,col-1)) && (col-1<= opponent.board.size())){
-                            for(int i=0; i<targetShip.size();i++)
-                                opponent.board.at(row,col-1).isHit = true;
-                        }
-                        else{//it's neither head, nor tail, it's one of the spots in the middle of the ship
-                            //shoot the ship to the right until you get to the end of the right side
-                            for(int i=row+1;i<=targetShip.size();i++)
-                                opponent.board.at(i,col).isHit = true;
-                            //shoot to the left until the ship is sunk
-                            int newRow = row -1;
-                            while(!targetShip.isSunk()){
-                                opponent.board.at(newRow,col).isHit = true;
-                                newRow--;
-                            }
-                        }
-                    }
-                }
-                else if(targetShip.isVertical()){
-                    //if this place is the ship's head || the tail
-                    if((targetShip.head().x == row && targetShip.head().y == col)||
-                            (targetShip.tail().x==row && targetShip.tail().y == col)){
-                        //find if targetShip is oriented above
-                        if(targetShip.places.contains(opponent.board.at(row+1,col)) && (row+1 <= opponent.board.size())){
-                            for(int i=0; i<targetShip.size();i++){
-                                //mark opponentBoard[row][col+1] as hit
-                                opponent.board.at(row+1,col).isHit = true;
-                            }
-                        }
-                        //the ship is oriented below
-                        else if(targetShip.places.contains(opponent.board.at(row-1,col))&& (row-1<=opponent.board.size())){
-                            //mark opponentBoard[row][col+1] as hit
-                            for(int i=0; i<targetShip.size();i++)
-                                opponent.board.at(row-1,col).isHit = true;
-                        }
-                        //i
-                        else{//it's neither head, nor tail, it's one of the spots in the middle of the ship
-                            //shoot above the ship until you get to the end of it
-                            for(int i=col+1; i <= targetShip.size(); i++)
-                                opponent.board.at(row,i).isHit = true;
-                            //shoot below the ship until it's sunk
-                            int newCol = col-1;
-                            while(!targetShip.isSunk()){
-                                opponent.board.at(row,newCol).isHit = true;
-                                newCol--;
-                            }
-                        }
+		int row = 0;
+		int col = 0;
+		while(!opponent.board.isGameOver()){
+			System.out.println("inside game over while loop");
+			//max  = 10 (the board size)
+			//min = 1 (the smallest board index)
+			row = (int)(Math.random() * ((10 - 1) + 1)) + 1;
+			col = (int)(Math.random() * ((10 - 1) + 1)) + 1;
+			System.out.println("row: " + row);
+			System.out.println("col:  "+ col);
+			Place hitSpot = opponent.board.at(row,col);
+			//if this place has already been hit
+			if(hitSpot.isHit())
+				continue;
+			//otherwise mark this place as hit
+			hitSpot.hit();
+			//repaint the board panel
+			opponent.repaint();
+			System.out.println("repainted opponent");
+			System.out.println("spot was hit");
+			if(!hitSpot.hasShip()){
+				System.out.println("there's no ship at hit spot");
+			}
+			//if there's a ship at opponentBoard[row][col]
+			if(hitSpot.hasShip()){
+				//get the ship that's on this place
+				System.out.println("hitSpot has a ship");
+				Ship targetShip = hitSpot.ship();
+				while(!targetShip.isSunk()){
+					if(targetShip.isHorizontal()){
+						//if this place is the ship's head || the tail
+						if((targetShip.head().x == row && targetShip.head().y == col) ||
+								(targetShip.tail().x == row && targetShip.tail().y == col)){
+							//find if targetShip is oriented to the right
+							if((col+1 <= opponent.board.size()) && targetShip.places.contains(opponent.board.at(row,col+1))){
+								//mark opponentBoard[row][col+1] as hit
+								opponent.board.at(row,col+1).isHit = true;
+								opponent.repaint();
+								col++;
+							}
+							//the ship is oriented to the left
+							else if ((col-1<= opponent.board.size()) && targetShip.places.contains(opponent.board.at(row,col-1))){
+								opponent.board.at(row,col-1).isHit = true;
+								opponent.repaint();
+								col--;
+							}
+							else{//it's neither head, nor tail, it's one of the spots in the middle of the ship
+								//shoot the ship to the right until you get to the end of the right side
+								if((col+1 <= opponent.board.size()) && targetShip.places.contains(opponent.board.at(row,col+1))){
+									opponent.board.at(row,col+1).isHit = true;
+									opponent.repaint();
+									col++;
+								}
+								//shoot to the left until the ship is sunk
+								if((col-1 <= opponent.board.size() && opponent.board.at(row,col-1).isHit))
+									col--; //more to the left of the ship until you find a spot that hasn't been hit
+								else if(col-1 <= opponent.board.size() && !opponent.board.at(row,col-1).isHit){
+									opponent.board.at(row,col).isHit = true;
+									opponent.repaint();
+									col--;
+								}
 
-                    }
-                }
-            }
-        }
-    }
+							}
+						}
+					}
+					else if(targetShip.isVertical()){
+						//if this place is the ship's head || the tail
+						if((targetShip.head().x == row && targetShip.head().y == col)||
+								(targetShip.tail().x==row && targetShip.tail().y == col)){
+							//find if targetShip is oriented below
+							if((row+1 <= opponent.board.size()) && targetShip.places.contains(opponent.board.at(row+1,col))){
+								//mark opponentBoard[row][col+1] as hit
+								opponent.board.at(row+1,col).isHit = true;
+								opponent.repaint();
+								row++;
+							}
+							//the ship is oriented above
+							else if((row-1<=opponent.board.size()) && targetShip.places.contains(opponent.board.at(row-1,col))){
+								//mark opponentBoard[row][col+1] as hit
+								opponent.board.at(row-1,col).isHit = true;
+								opponent.repaint();
+								row--;
+							}
+							else{//it's neither head, nor tail, it's one of the spots in the middle of the ship
+								//shoot above the ship until you get to the end of it
+								if((row-1 <= opponent.board.size()) && targetShip.places.contains(opponent.board.at(row-1,col))){
+									opponent.board.at(row-1,col).isHit = true;
+									opponent.repaint();
+									row--;
+								}
+								//shoot below the ship until it is sunk
+								if((row+1 <= opponent.board.size() && opponent.board.at(row+1,col).isHit))
+									row++; //more to the bottom of the ship until you find a spot that hasn't been hit
+								else if(row-1 <= opponent.board.size() && !opponent.board.at(row-1,col).isHit){
+									opponent.board.at(row-1,col).isHit = true;
+									opponent.repaint();
+									row++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+    
 
 
 }
